@@ -1,0 +1,26 @@
+# to be able to configure hyper-v vm.
+#ENV['VAGRANT_EXPERIMENTAL'] = 'typed_triggers'
+
+$domain = "example.com"
+$domain_ip_address = "192.168.56.3"
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "gusztavvargadr/windows-server"
+    config.vm.define "windows-server2"
+    config.vm.hostname = "server02"
+
+    # use the plaintext WinRM transport and force it to use basic authentication.
+    # NB this is needed because the default negotiate transport stops working
+    #    after the domain controller is installed.
+    #    see https://groups.google.com/forum/#!topic/vagrant-up/sZantuCM0q4
+    config.winrm.transport = :plaintext
+    config.winrm.basic_auth_only = true
+
+
+    config.vm.network "private_network",
+        ip: $domain_ip_address
+
+    config.vm.provision "shell", path: "provision/ps.ps1", args: ["configure-hyperv-guest.ps1", $domain_ip_address]
+    config.vm.provision "shell", path: "provision/ps.ps1", args: "addToDomain.ps1"
+
+end
