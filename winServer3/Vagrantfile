@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+Vagrant.configure("2") do |config|
+
+ config.vbguest.auto_update = false
+
+ config.vm.box = "cdaf/WindowsServerCore"
+ config.vm.network "private_network", type: "dhcp", virtualbox__intnet: "network_os"
+ config.vm.hostname = "winServer3"
+
+ config.vm.provider "virtualbox" do |vb|
+   vb.memory = 512
+   vb.cpus = 1
+   vb.name = "winServer3"
+ end
+
+end 

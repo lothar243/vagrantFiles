@@ -1,13 +1,10 @@
-# to be able to configure hyper-v vm.
-#ENV['VAGRANT_EXPERIMENTAL'] = 'typed_triggers'
-
-$domain = "missoula.com"
+$domain = "missoula.local"
 $domain_ip_address = "192.168.56.2"
 
 Vagrant.configure("2") do |config|
     config.vm.box = "gusztavvargadr/windows-server"
-    config.vm.define "windows-domain-controller"
-    config.vm.hostname = "dc"
+    config.vm.define "windows-dc01"
+    config.vm.hostname = "dc01"
 
     # use the plaintext WinRM transport and force it to use basic authentication.
     # NB this is needed because the default negotiate transport stops working
@@ -17,11 +14,13 @@ Vagrant.configure("2") do |config|
     config.winrm.basic_auth_only = true
 
 
-    config.vm.network "private_network",
-        ip: $domain_ip_address
-#libvirt__forward_mode: "route",
-#        libvirt__dhcp_enabled: false,
-#        hyperv__bridge: "windows-domain-controller"
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 1
+      vb.name = "dc01"
+    end
+
+    config.vm.network "private_network", ip: "192.168.56.2", virtualbox__intnet: "network_os"
 
     config.vm.provision "shell", path: "provision/ps.ps1", args: ["configure-hyperv-guest.ps1", $domain_ip_address]
     config.vm.provision "shell", path: "provision/ps.ps1", args: ["domain-controller.ps1", $domain]
@@ -33,13 +32,12 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provision/ps.ps1", args: "provision-base.ps1"
     config.vm.provision "shell", reboot: true
     config.vm.provision "shell", path: "provision/ps.ps1", args: "domain-controller-wait-for-ready.ps1"
-    # TODO after https://github.com/FriedrichWeinmann/GPOTools/issues/5#issuecomment-781598022 is fixed use ps.ps1 to call provision-gpos.ps1.
     config.vm.provision "shell", inline: "cd c:/vagrant/provision; ./provision-gpos.ps1"
     config.vm.provision "shell", path: "provision/ps.ps1", args: "ad-explorer.ps1"
-    #config.vm.provision "shell", path: "provision/ps.ps1", args: "ca.ps1"
     config.vm.provision "shell", reboot: true
-    #config.vm.provision "shell", path: "provision/ps.ps1", args: "provision-winrm-https-listener.ps1"
-    #config.vm.provision "shell", path: "provision/ps.ps1", args: "provision-msys2.ps1"
-    #config.vm.provision "shell", path: "provision/ps.ps1", args: "provision-firewall.ps1"
+    config.vm.provision "shell", inline: <<-SHELL
+      Remove-netIpAddress -interfaceAlias "Ethernet 2" -confirm:$false
+      new-netipAddress -interfaceAlias "Ethernet 2" -IPAddress 192.168.56.2 -DefaultGateway 192.168.56.1 -PrefixLength 24
+    SHELL
     config.vm.provision "shell", path: "provision/ps.ps1", args: "summary.ps1"
 end
