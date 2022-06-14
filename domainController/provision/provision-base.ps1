@@ -79,26 +79,8 @@ Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1"
 Remove-Item -Force "$env:USERPROFILE\Desktop\*.lnk"
 Remove-Item -Force "$env:PUBLIC\Desktop\*.lnk"
 Install-ChocolateyShortcut `
-    -ShortcutFilePath "$env:USERPROFILE\Desktop\Computer Certificates.lnk" `
-    -TargetPath 'C:\Windows\System32\certlm.msc'
-Install-ChocolateyShortcut `
-    -ShortcutFilePath "$env:USERPROFILE\Desktop\Services.lnk" `
-    -TargetPath 'C:\Windows\System32\services.msc'
-Install-ChocolateyShortcut `
-    -ShortcutFilePath "$env:USERPROFILE\Desktop\DNS Manager.lnk" `
-    -TargetPath 'C:\Windows\System32\dnsmgmt.msc'
-Install-ChocolateyShortcut `
     -ShortcutFilePath "$env:USERPROFILE\Desktop\AD Explorer.lnk" `
     -TargetPath 'C:\Program Files\ADExplorer\ADExplorer.exe'
-# add MSYS2 shortcut to the Desktop and Start Menu.
-Install-ChocolateyShortcut `
-    -ShortcutFilePath "$env:USERPROFILE\Desktop\MSYS2 Bash.lnk" `
-    -TargetPath "$env:ChocolateyToolsLocation\msys64\mingw64.exe" `
-    -WorkingDirectory '%USERPROFILE%'
-Install-ChocolateyShortcut `
-    -ShortcutFilePath "C:\Users\All Users\Microsoft\Windows\Start Menu\Programs\MSYS2 Bash.lnk" `
-    -TargetPath "$env:ChocolateyToolsLocation\msys64\mingw64.exe" `
-    -WorkingDirectory '%USERPROFILE%'
 
 # restart explorer to apply the changed settings.
 (Get-Process explorer).Kill()
@@ -122,6 +104,16 @@ $chromeLocation = 'C:\Program Files\Google\Chrome\Application'
 cp -Force GoogleChrome-external_extensions.json (Resolve-Path "$chromeLocation\*\default_apps\external_extensions.json")
 cp -Force GoogleChrome-master_preferences.json "$chromeLocation\master_preferences"
 cp -Force GoogleChrome-master_bookmarks.html "$chromeLocation\master_bookmarks.html"
+#Install-ChocolateyShortcut `
+#    -ShortcutFilePath "$env:USERPROFILE\Desktop\Chrome.lnk" `
+#    -TargetPath "C:\Program Files\Google\Chrome\Application\chrome.exe"
+copy 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk' c:\users\public\desktop\
+
+
+# Download Sysinternals suite and put it on the desktop
+Invoke-WebRequest -uri https://download.sysinternals.com/files/SysinternalsSuite.zip -OutFile c:\tmp\sysinternalssuite.zip
+mkdir c:\users\public\desktop\SysInternalsSuite
+expand-archive -path c:\tmp\sysinternalssuite.zip -destinationpath C:\users\public\desktop\SysInternalsSuite\
 
 # replace notepad with notepad3.
 choco install -y notepad3
