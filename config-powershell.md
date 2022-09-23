@@ -8,6 +8,7 @@
     Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # from a privileged powershell
+    choco install git
     choco install chrome
     choco install firefox
     choco install notepad3
