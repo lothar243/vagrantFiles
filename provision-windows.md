@@ -1,3 +1,8 @@
+# Debloat (From Chris Titus Tech) - go to tweaks and select desktop
+``` powershell
+irm christitus.com/win | iex
+```
+
 # Install winget from the Microsoft store (They call it "App Installer")
 
 # Use winget to install Powershell 7
@@ -54,3 +59,5 @@ New-Item -Path HKCU:Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetSt
     | New-ItemProperty -Name FullPath -Value 1 -PropertyType DWORD `
     | Out-Null
 
+# Disable animations
+\# Go to Control Panel -> Search for animations -> Turn off unnecessary animations
