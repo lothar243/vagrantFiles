@@ -1,17 +1,8 @@
-$installvagrant = <<-SCRIPT
-sudo apt update
-sudo apt-get install ca-certificates curl gnupg lsb-release -y
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-compose -y
-SCRIPT
+# Note - I had to use vbguest versin 0.21 to get the provision script to work
+# vagrant plugin install vagrant-vbguest --plugin-version 0.21
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "aspyatkin/ubuntu-18.04-server"
+  config.vm.box = "centos/7"
   config.vm.network "private_network", type: "dhcp", virtualbox__intnet: "network_os"
   config.vm.hostname = "linuxserver1"
 
@@ -19,7 +10,7 @@ Vagrant.configure("2") do |config|
    vb.memory = 2048
    vb.cpus = 1
    vb.name = "linuxserver1"
- end
+  end
 
-  config.vm.provision "shell", inline: $installvagrant
+  config.vm.provision :shell, :path => "provision.sh"
 end
