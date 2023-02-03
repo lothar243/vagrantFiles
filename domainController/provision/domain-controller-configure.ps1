@@ -163,7 +163,7 @@ New-ADUser `
     -OtherAttributes @{
         photo = [byte[]](Get-Content -Encoding byte "users-photos/user-photo-$name.jpg")
     }
-
+Add-ADGroupMember -Identity "Domain Admins" -Members "jane.doe"
 
 echo 'john.doe Group Membership'
 Get-ADPrincipalGroupMembership -Identity 'john.doe' `
